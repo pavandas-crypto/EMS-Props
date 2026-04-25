@@ -1,0 +1,6 @@
+2026-04-25 07:32:10 | User: 1 | Action: LOGIN | Details: User logged in
+2026-04-25 07:35:17 | User: 1 | Action: REGISTRATION_STATUS_UPDATED | Details: Registration status updated: 1
+2026-04-25 07:37:29 | User: 1 | Action: EVENT_CREATED | Details: Event created: Papu Birthday
+2026-04-25 08:16:14 | User: 1 | Action: EVENT_UPDATED | Details: Event updated: ID 1
+2026-04-25 08:33:51 | User: 1 | Action: EVENT_UPDATED | Details: Event updated: ID 2
+2026-04-25 08:33:55 | User: 1 | Action: LOGOUT | Details: User logged out

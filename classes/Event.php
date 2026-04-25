@@ -130,7 +130,7 @@ class Event {
     /**
      * Get upcoming events (for public)
      */
-    public function get_upcoming_events($limit = 10) {
+    public function get_upcoming_events($offset = 0, $limit = 10) {
         try {
             $now = date('Y-m-d H:i:s');
             
@@ -138,12 +138,12 @@ class Event {
                            e.end_date_time, e.address, i.url as image_url
                     FROM events e 
                     LEFT JOIN images i ON e.image_id = i.image_id
-                    WHERE e.event_for = 'all' AND e.start_date_time > ?
+                    WHERE e.start_date_time >= ?
                     ORDER BY e.start_date_time ASC
-                    LIMIT ?";
+                    LIMIT ? OFFSET ?";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param('si', $now, $limit);
+            $stmt->bind_param('sii', $now, $limit, $offset);
             $stmt->execute();
             $result = $stmt->get_result();
             
@@ -157,6 +157,29 @@ class Event {
         } catch (Exception $e) {
             error_log('Get Upcoming Events Error: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * Get upcoming event count
+     */
+    public function get_upcoming_event_count() {
+        try {
+            $now = date('Y-m-d H:i:s');
+            $sql = "SELECT COUNT(*) as total
+                    FROM events e
+                    WHERE e.start_date_time >= ?";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bind_param('s', $now);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            
+            return (int)($row['total'] ?? 0);
+        } catch (Exception $e) {
+            error_log('Get Upcoming Event Count Error: ' . $e->getMessage());
+            return 0;
         }
     }
     

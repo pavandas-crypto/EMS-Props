@@ -6,7 +6,7 @@
 // Application Settings
 define('APP_NAME', 'Event Management System');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost/eve');
+define('APP_URL', 'http://localhost/EMS-Props');
 
 // Session Settings
 define('SESSION_TIMEOUT', 3600); // 1 hour
@@ -28,6 +28,7 @@ define('ROLE_VERIFIER', 'verifier');
 // Registration Statuses
 define('REG_STATUS_PENDING', 1);
 define('REG_STATUS_APPROVED', 2);
+define('REG_STATUS_REJECTED', 5);
 
 // Attendance Statuses
 define('ATTENDANCE_NOT_PRESENT', 3);

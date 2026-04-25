@@ -103,32 +103,6 @@ function log_activity($action, $details = '', $user_id = null) {
 }
 
 /**
- * Rate limiting (simple)
- */
-function check_rate_limit($identifier, $limit = 5, $window = 60) {
-    $key = 'rate_limit_' . $identifier;
-    
-    if (!isset($_SESSION[SESSION_NAME][$key])) {
-        $_SESSION[SESSION_NAME][$key] = [];
-    }
-    
-    $now = time();
-    $_SESSION[SESSION_NAME][$key] = array_filter(
-        $_SESSION[SESSION_NAME][$key],
-        function($time) use ($now, $window) {
-            return ($now - $time) < $window;
-        }
-    );
-    
-    if (count($_SESSION[SESSION_NAME][$key]) >= $limit) {
-        return false;
-    }
-    
-    $_SESSION[SESSION_NAME][$key][] = $now;
-    return true;
-}
-
-/**
  * Sanitize filename
  */
 function sanitize_filename($filename) {

@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upcoming Events - Event Management System</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .event-date-group { margin-bottom: 32px; }
+        .event-date-heading { margin-bottom: 18px; font-size: 1.6rem; color: #1f2937; }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -51,7 +55,7 @@
             </div>
 
             <!-- Events Grid -->
-            <div id="events-container" class="events-grid">
+            <div id="events-container" class="events-list">
                 <div class="loading-container">
                     <div class="loading"></div>
                     <p class="loading-text">Loading events...</p>
@@ -83,7 +87,7 @@
         <p>Streamline your event management experience</p>
     </footer>
 
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=2"></script>
     <script>
         let currentPage = 1;
         let searchMode = false;
@@ -121,8 +125,8 @@
 
             document.getElementById('no-events-message').style.display = 'none';
 
-            // Render events
-            container.innerHTML = events.map(event => UI.createEventCard(event)).join('');
+            // Render events grouped by date
+            container.innerHTML = UI.createEventsByDate(events);
 
             // Update pagination
             currentPage = page;

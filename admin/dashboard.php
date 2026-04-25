@@ -29,9 +29,11 @@ $eventCount = $eventClass->get_event_count();
         .admin-list { width: 100%; border-collapse: collapse; }
         .admin-list th, .admin-list td { padding: 14px 12px; border-bottom: 1px solid #f0f2f7; }
         .admin-list th { text-align: left; background: #f8fafd; }
+        .button-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .status-badge { display: inline-flex; padding: 6px 10px; border-radius: 999px; font-size: 12px; color: #fff; }
         .status-badge.pending { background: #f0ad4e; }
         .status-badge.approved { background: #28a745; }
+        .status-badge.rejected { background: #dc3545; }
         .small-note { color: #6c757d; font-size: 14px; }
     </style>
 </head>
@@ -44,6 +46,7 @@ $eventCount = $eventClass->get_event_count();
                     <p class="small-note">Manage events, registration forms, approvals, and ticket generation from one place.</p>
                 </div>
                 <div>
+                    <a href="../public/login.php" class="btn btn-secondary" style="margin-right: 10px;">Verifier Login</a>
                     <a href="logout.php" class="btn btn-secondary">Logout</a>
                 </div>
             </div>
@@ -68,6 +71,11 @@ $eventCount = $eventClass->get_event_count();
                     <h3>Generate Tickets</h3>
                     <p>Choose a ticket template and bulk-generate tickets only for approved registrations.</p>
                     <a href="generate-tickets.php" class="btn btn-primary">Generate Tickets</a>
+                </div>
+                <div class="admin-card">
+                    <h3>Manage Verifiers</h3>
+                    <p>Create verifiers, assign them to events, and manage their access permissions.</p>
+                    <a href="verifiers.php" class="btn btn-primary">Manage Verifiers</a>
                 </div>
             </div>
 
@@ -94,9 +102,12 @@ $eventCount = $eventClass->get_event_count();
                                 <td><?php echo htmlspecialchars(date('M d, Y H:i', strtotime($event['start_date_time']))); ?> <br> to <br> <?php echo htmlspecialchars(date('M d, Y H:i', strtotime($event['end_date_time']))); ?></td>
                                 <td><?php echo (int)$event['total_registrations']; ?></td>
                                 <td>
-                                    <a href="event-form.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Form</a>
-                                    <a href="registrations.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Registrations</a>
-                                    <a href="generate-tickets.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Tickets</a>
+                                    <div class="button-group">
+                                        <a href="event-edit.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                        <a href="event-form.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Form</a>
+                                        <a href="registrations.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Registrations</a>
+                                        <a href="generate-tickets.php?event_id=<?php echo (int)$event['event_id']; ?>" class="btn btn-secondary btn-sm">Tickets</a>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

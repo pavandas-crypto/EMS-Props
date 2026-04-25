@@ -19,14 +19,30 @@ $events = $eventClass->get_all_events(0, 50);
 $message = '';
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'approve') {
+// Ensure rejected status exists in the status master table
+try {
+    $db->query("INSERT INTO status_master (status_id, TYPE, NAME, description, created_at) SELECT 5, 'registration', 'rejected', 'Registration rejected by admin', NOW() FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM status_master WHERE status_id = 5)");
+} catch (Exception $e) {
+    // ignore if status already exists or query fails
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $registration_id = (int)($_POST['registration_id'] ?? 0);
     if ($registration_id > 0) {
-        $result = $registrationClass->update_status($registration_id, REG_STATUS_APPROVED);
-        if ($result['success']) {
-            $message = 'Registration approved successfully.';
-        } else {
-            $error = $result['message'];
+        if ($_POST['action'] === 'approve') {
+            $result = $registrationClass->update_status($registration_id, REG_STATUS_APPROVED);
+            if ($result['success']) {
+                $message = 'Registration approved successfully.';
+            } else {
+                $error = $result['message'];
+            }
+        } elseif ($_POST['action'] === 'reject') {
+            $result = $registrationClass->update_status($registration_id, REG_STATUS_REJECTED);
+            if ($result['success']) {
+                $message = 'Registration rejected successfully.';
+            } else {
+                $error = $result['message'];
+            }
         }
     }
 }
@@ -48,6 +64,10 @@ if ($event_id > 0) {
         .registration-table { width: 100%; border-collapse: collapse; margin-top: 18px; }
         .registration-table th, .registration-table td { padding: 12px 10px; border: 1px solid #edf0f4; }
         .registration-table th { background: #f8fafc; }
+        .button-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .status-badge { display: inline-flex; padding: 6px 10px; border-radius: 999px; font-size: 12px; color: #fff; }
+        .status-badge.approved { background: #28a745; }
+        .status-badge.rejected { background: #dc3545; }
     </style>
 </head>
 <body>
@@ -111,15 +131,36 @@ if ($event_id > 0) {
                                 <td><?php echo htmlspecialchars(ucfirst($registration['status_name'] ?? 'unknown')); ?></td>
                                 <td><?php echo htmlspecialchars($registration['registered_at']); ?></td>
                                 <td>
-                                    <?php if ($registration['registration_status_id'] === REG_STATUS_PENDING): ?>
-                                        <form method="post" style="display:inline-block;">
-                                            <input type="hidden" name="action" value="approve">
-                                            <input type="hidden" name="registration_id" value="<?php echo (int)$registration['registration_id']; ?>">
-                                            <button type="submit" class="btn btn-primary btn-sm">Approve</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="small-meta">Approved</span>
-                                    <?php endif; ?>
+                                    <div class="button-group">
+                                        <?php if ($registration['registration_status_id'] === REG_STATUS_PENDING): ?>
+                                            <form method="post" style="display:inline-block; margin:0;">
+                                                <input type="hidden" name="action" value="approve">
+                                                <input type="hidden" name="registration_id" value="<?php echo (int)$registration['registration_id']; ?>">
+                                                <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                                            </form>
+                                            <form method="post" style="display:inline-block; margin:0;">
+                                                <input type="hidden" name="action" value="reject">
+                                                <input type="hidden" name="registration_id" value="<?php echo (int)$registration['registration_id']; ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                            </form>
+                                        <?php elseif ($registration['registration_status_id'] === REG_STATUS_APPROVED): ?>
+                                            <span class="status-badge approved">Approved</span>
+                                            <form method="post" style="display:inline-block; margin:0;">
+                                                <input type="hidden" name="action" value="reject">
+                                                <input type="hidden" name="registration_id" value="<?php echo (int)$registration['registration_id']; ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                            </form>
+                                        <?php elseif ($registration['registration_status_id'] === REG_STATUS_REJECTED): ?>
+                                            <span class="status-badge rejected">Rejected</span>
+                                            <form method="post" style="display:inline-block; margin:0;">
+                                                <input type="hidden" name="action" value="approve">
+                                                <input type="hidden" name="registration_id" value="<?php echo (int)$registration['registration_id']; ?>">
+                                                <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="small-meta"><?php echo htmlspecialchars(ucfirst($registration['status_name'] ?? 'Unknown')); ?></span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

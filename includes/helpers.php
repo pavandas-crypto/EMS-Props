@@ -214,4 +214,32 @@ function is_valid_json($string) {
     return json_last_error() === JSON_ERROR_NONE;
 }
 
+/**
+ * Check rate limit
+ */
+function check_rate_limit($key, $max_attempts = 5, $window_seconds = 300) {
+    $now = time();
+    $window_start = $now - $window_seconds;
+
+    if (!isset($_SESSION['rate_limit'])) {
+        $_SESSION['rate_limit'] = [];
+    }
+
+    // Clean old entries
+    $_SESSION['rate_limit'][$key] = array_filter(
+        $_SESSION['rate_limit'][$key] ?? [],
+        function($timestamp) use ($window_start) {
+            return $timestamp > $window_start;
+        }
+    );
+
+    // Check if under limit
+    if (count($_SESSION['rate_limit'][$key] ?? []) < $max_attempts) {
+        $_SESSION['rate_limit'][$key][] = $now;
+        return true;
+    }
+
+    return false;
+}
+
 ?>

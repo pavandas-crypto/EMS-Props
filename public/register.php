@@ -127,7 +127,7 @@
         <p>Streamline your event management experience</p>
     </footer>
 
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=2"></script>
     <script>
         /**
          * Get event ID from URL
@@ -231,7 +231,8 @@
                 // Redirect to success page
                 window.location.href = `success.php?registration_id=${registrationId}&event_id=${eventId}`;
             } else {
-                UI.showAlert(response.data.data.message || 'Registration failed', 'danger');
+                const errorMessage = response.data?.message || response.data?.data?.message || 'Registration failed';
+                UI.showAlert(errorMessage, 'danger');
                 UI.enableButton(submitBtn, originalText);
             }
         });

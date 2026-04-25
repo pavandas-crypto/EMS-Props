@@ -55,7 +55,7 @@
         <p>Streamline your event management experience</p>
     </footer>
 
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=2"></script>
     <script>
         /**
          * Get event ID from URL
@@ -109,7 +109,7 @@
             let html = `
                 <div class="event-detail-image">
                     ${event.image_url 
-                        ? `<img src="${event.image_url}" alt="${event.event_name}">` 
+                        ? `<img src="${event.image_url.startsWith('http://') || event.image_url.startsWith('https://') || event.image_url.startsWith('/') ? event.image_url : '../' + event.image_url}" alt="${event.event_name}">` 
                         : `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 120px;">📅</div>`
                     }
                 </div>

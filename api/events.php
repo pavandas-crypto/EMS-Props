@@ -24,8 +24,8 @@ try {
     
     if ($type === 'upcoming') {
         // Get upcoming public events
-        $events = $event->get_upcoming_events($limit);
-        $total = count($events);
+        $events = $event->get_upcoming_events($offset, $limit);
+        $total = $event->get_upcoming_event_count();
         
     } elseif ($type === 'search') {
         $search = sanitize($_GET['q'] ?? '');

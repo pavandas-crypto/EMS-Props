@@ -2,7 +2,8 @@
  * API Client for Event Management System
  */
 
-const API_BASE_URL = '/eve/api';
+const pathPrefix = window.location.pathname.split('/public/')[0];
+const API_BASE_URL = `${window.location.origin}${pathPrefix}/api`;
 
 class EventAPI {
     /**
@@ -146,6 +147,42 @@ const UI = {
     },
 
     /**
+     * Build asset URL for images stored in uploads/
+     */
+    buildAssetUrl(url) {
+        if (!url) {
+            return url;
+        }
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+            return url;
+        }
+        return '../' + url;
+    },
+
+    /**
+     * Group events by date and render sections
+     */
+    createEventsByDate(events) {
+        const grouped = events.reduce((result, event) => {
+            const eventDate = new Date(event.start_date_time).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            if (!result[eventDate]) {
+                result[eventDate] = [];
+            }
+            result[eventDate].push(event);
+            return result;
+        }, {});
+
+        return Object.entries(grouped).map(([date, dateEvents]) => {
+            return `
+                <div class="event-date-group">
+                    <h2 class="event-date-heading">${date}</h2>
+                    <div class="events-grid">${dateEvents.map(event => this.createEventCard(event)).join('')}</div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    /**
      * Disable button
      */
     disableButton(button, loading = true) {
@@ -283,7 +320,7 @@ const UI = {
             <div class="event-card">
                 <div class="event-image">
                     ${event.image_url 
-                        ? `<img src="${event.image_url}" alt="${event.event_name}">` 
+                        ? `<img src="${this.buildAssetUrl(event.image_url)}" alt="${event.event_name}">` 
                         : `<div class="event-image-placeholder">📅</div>`
                     }
                 </div>

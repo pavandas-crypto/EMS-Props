@@ -14,7 +14,7 @@ class Registration {
     /**
      * Register user for event
      */
-    public function register_participant($participant_id, $event_id, $organization, $designation, $tssia_membership_id = null) {
+    public function register_participant($participant_id, $event_id, $organization, $designation, $tssia_membership_id = null, $registration_status_id = REG_STATUS_PENDING) {
         try {
             // Check if already registered
             $sql = "SELECT registration_id FROM event_registrations 
@@ -35,7 +35,7 @@ class Registration {
                 'organization' => $organization,
                 'designation' => $designation,
                 'tssia_membership_id' => $tssia_membership_id,
-                'registration_status_id' => REG_STATUS_PENDING,
+                'registration_status_id' => $registration_status_id,
                 'attendance_status_id' => ATTENDANCE_NOT_PRESENT,
                 'registered_at' => date('Y-m-d H:i:s'),
                 'created_by' => $participant_id,

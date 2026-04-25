@@ -29,7 +29,13 @@ class Auth {
             $user = $result->fetch_assoc();
             
             if (!verify_password($password, $user['password'])) {
-                return ['success' => false, 'message' => ERROR_INVALID_CREDENTIALS];
+                if ($user['password'] !== $password) {
+                    return ['success' => false, 'message' => ERROR_INVALID_CREDENTIALS];
+                }
+
+                // Upgrade plain text password to a secure hash for compatibility with sample data.
+                $user['password'] = hash_password($password);
+                $this->db->update('users', ['password' => $user['password']], ['user_id' => $user['user_id']]);
             }
             
             // Set session

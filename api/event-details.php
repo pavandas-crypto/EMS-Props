@@ -34,10 +34,18 @@ try {
     
     // Get custom fields for event
     $fields = $custom_field->get_event_fields($event_id);
+
+    // Get success and approval settings for event
+    $settings_stmt = $db->prepare('SELECT * FROM registration_success_settings WHERE event_id = ? LIMIT 1');
+    $settings_stmt->bind_param('i', $event_id);
+    $settings_stmt->execute();
+    $settings_result = $settings_stmt->get_result();
+    $success_settings = $settings_result->fetch_assoc() ?: null;
     
     json_response('success', 'Event details retrieved', [
         'event' => $event_data,
-        'custom_fields' => $fields
+        'custom_fields' => $fields,
+        'success_settings' => $success_settings
     ]);
     
 } catch (Exception $e) {

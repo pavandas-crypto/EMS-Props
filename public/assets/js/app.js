@@ -229,7 +229,17 @@ const UI = {
         const data = {};
 
         for (let [key, value] of formData.entries()) {
-            data[key] = value;
+            const match = key.match(/^([^[\]]+)\[([^\]]+)\]$/);
+            if (match) {
+                const root = match[1];
+                const nestedKey = match[2];
+                if (!data[root]) {
+                    data[root] = {};
+                }
+                data[root][nestedKey] = value;
+            } else {
+                data[key] = value;
+            }
         }
 
         return data;

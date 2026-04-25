@@ -113,9 +113,10 @@
 
                 if (response.success) {
                     const event = response.data.data.event;
-                    showSuccess(registrationId, event);
+                    const settings = response.data.data.success_settings || null;
+                    showSuccess(registrationId, event, settings);
                 } else {
-                    showSuccess(registrationId, null);
+                    showSuccess(registrationId, null, null);
                 }
 
             } catch (error) {
@@ -127,7 +128,7 @@
         /**
          * Show success message
          */
-        function showSuccess(regId, event) {
+        function showSuccess(regId, event, settings) {
             document.getElementById('loading-container').style.display = 'none';
             document.getElementById('error-container').style.display = 'none';
             document.getElementById('success-container').style.display = 'block';
@@ -142,6 +143,24 @@
             } else {
                 document.getElementById('event-name').textContent = 'Event';
                 document.getElementById('event-link').style.display = 'none';
+            }
+
+            // Update success page content if event settings are available
+            if (settings) {
+                const titleElement = document.querySelector('.success-title');
+                const messageElement = document.querySelector('.success-message');
+
+                if (settings.success_title) {
+                    titleElement.textContent = settings.success_title;
+                }
+
+                if (settings.show_approval_notice && settings.show_approval_notice.toString() === '1') {
+                    messageElement.innerHTML = settings.approval_message ||
+                        'Your registration is pending approval. You will receive confirmation once it is approved.';
+                } else {
+                    messageElement.innerHTML = settings.success_message ||
+                        'Your registration is confirmed. Check your email for ticket details and next steps.';
+                }
             }
 
             // Scroll to top

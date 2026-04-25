@@ -61,13 +61,26 @@ try {
         ]);
     }
     
+    // Determine approval mode for event
+    $status_id = REG_STATUS_PENDING;
+    $settings_stmt = $db->prepare('SELECT show_approval_notice FROM registration_success_settings WHERE event_id = ? LIMIT 1');
+    $settings_stmt->bind_param('i', $input['event_id']);
+    $settings_stmt->execute();
+    $settings_result = $settings_stmt->get_result();
+    if ($settings_row = $settings_result->fetch_assoc()) {
+        if ((int)$settings_row['show_approval_notice'] === 0) {
+            $status_id = REG_STATUS_APPROVED;
+        }
+    }
+
     // Register for event
     $reg_result = $registration->register_participant(
         $participant_id,
         $input['event_id'],
         $input['organization'],
         $input['designation'] ?? '',
-        $input['tssia_membership_id'] ?? null
+        $input['tssia_membership_id'] ?? null,
+        $status_id
     );
     
     if (!$reg_result['success']) {
